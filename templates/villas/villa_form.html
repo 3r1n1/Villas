@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — Villa{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_list_staff' %}">← Manage villas</a></p>
+<h1>{{ title }}</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="btn" type="submit">Save</button>
+</form>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Villas — Villa{% endblock %}
+
+{% block body_class %}villa-list-page{% endblock %}
+
+{% block content %}
+<h1>Villas</h1>
+
+<form class="villa-search-form" method="get" action="{% url 'villa_list' %}">
+    <div class="villa-search-bar">
+        <label class="sr-only" for="id_q">{{ search_form.q.label }}</label>
+        {{ search_form.q }}
+        <button type="submit" class="btn villa-search-submit">Search</button>
+    </div>
+
+    <fieldset class="villa-filters">
+        <legend class="villa-filters-legend">Filters</legend>
+        <div class="villa-filters-grid">
+            <div class="filter-field">
+                <label for="id_city">City</label>
+                {{ search_form.city }}
+            </div>
+            <div class="filter-field">
+                <label for="id_zone">Zone</label>
+                {{ search_form.zone }}
+            </div>
+            <div class="filter-field">
+                <label for="id_property_type">Type of real estate</label>
+                {{ search_form.property_type }}
+            </div>
+            <div class="filter-field">
+                <label for="id_bedrooms_min">Bedrooms (min.)</label>
+                {{ search_form.bedrooms_min }}
+            </div>
+            <div class="filter-field">
+                <label for="id_bathrooms_min">Bathrooms / WCs (min.)</label>
+                {{ search_form.bathrooms_min }}
+            </div>
+            <div class="filter-field">
+                <label for="id_garage">Garage</label>
+                {{ search_form.garage }}
+            </div>
+            <div class="filter-field">
+                <label for="id_price_min">Price (min.)</label>
+                {{ search_form.price_min }}
+            </div>
+            <div class="filter-field">
+                <label for="id_price_max">Price (max.)</label>
+                {{ search_form.price_max }}
+            </div>
+        </div>
+        {% if search_form.errors %}
+        <ul class="villa-filter-errors">
+            {% for field in search_form %}
+                {% for err in field.errors %}
+                <li class="error">{{ field.label }}: {{ err }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for err in search_form.non_field_errors %}
+            <li class="error">{{ err }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="villa-filters-actions">
+            <button type="submit" class="btn">Apply filters</button>
+            <a class="btn btn-secondary" href="{% url 'villa_list' %}">Clear all</a>
+        </div>
+    </fieldset>
+</form>
+
+<p class="villa-results-meta">{{ villas_count }} villa{{ villas_count|pluralize }} found</p>
+
+{% if villas %}
+<ul class="villa-grid">
+    {% for villa in villas %}
+    <li>
+        <a href="{% url 'villa_detail' slug=villa.slug %}" class="villa-card">
+            {% if villa.thumbnail %}
+            <span class="villa-card-img"><img src="{{ villa.thumbnail.url }}" alt="{{ villa.name }}"/></span>
+            {% else %}
+            <span class="villa-card-img villa-card-placeholder"></span>
+            {% endif %}
+            <span class="villa-card-body">
+                <strong>{{ villa.name }}</strong>
+                {% if villa.city or villa.zone %}
+                <span class="villa-address">{{ villa.city }}{% if villa.city and villa.zone %} · {% endif %}{{ villa.zone }}</span>
+                {% elif villa.address %}
+                <span class="villa-address">{{ villa.address }}</span>
+                {% endif %}
+                <span class="villa-card-type">{{ villa.get_property_type_display }}</span>
+                <span class="villa-card-specs">
+                    {% if villa.bedroom_count %}<span>{{ villa.bedroom_count }} bed{% if villa.bedroom_count != 1 %}s{% endif %}</span>{% endif %}
+                    {% if villa.bathroom_count %}<span>{{ villa.bathroom_count }} bath{% if villa.bathroom_count != 1 %}s{% endif %}</span>{% endif %}
+                    {% if villa.has_garage %}<span>Garage</span>{% endif %}
+                </span>
+                {% if villa.price %}
+                <span class="villa-card-price">{{ villa.price|floatformat:2 }}</span>
+                {% endif %}
+            </span>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No villas match your search. Try adjusting filters or <a href="{% url 'villa_list' %}">clear them</a>.</p>
+{% endif %}
+{% endblock %}

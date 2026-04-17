@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Hotspots — {{ room.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_manage_rooms' slug=room.villa.slug %}">← {{ room.villa.name }}</a></p>
+<h1>Hotspots: {{ room.name }}</h1>
+<p>Place each hotspot at a yaw/pitch where visitors should click to go to another room. Use the virtual tour to estimate angles, or refine by trial.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}
+    <div class="error">{{ formset.non_form_errors }}</div>
+    {% endif %}
+    {% for form in formset %}
+    <fieldset style="margin-bottom:1rem; border:1px solid var(--color-border); padding:1rem; border-radius:0.5rem;">
+        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+        {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+        {% if form.DELETE %}<div>{{ form.DELETE }} <label for="{{ form.DELETE.id_for_label }}">Delete</label></div>{% endif %}
+        {% for field in form.visible_fields %}
+        <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for err in field.errors %}<div class="error">{{ err }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+    </fieldset>
+    {% endfor %}
+    <button class="btn" type="submit">Save hotspots</button>
+</form>
+{% endblock %}

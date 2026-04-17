@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Admin dashboard</h1>
+<p>Welcome, {{ request.user.username }}{% if request.user.is_superuser %} (superadmin){% endif %}.</p>
+
+<p>
+    <a class="btn" href="{% url 'villa_add' %}">Add villa</a>
+    <a class="btn btn-secondary" href="{% url 'villa_list_staff' %}">Manage villas</a>
+    {% if request.user.is_superuser %}
+    <a class="btn btn-secondary" href="{% url 'add_admin' %}">Add administrator</a>
+    {% endif %}
+</p>
+
+{% if villas %}
+<h2>Villas</h2>
+<ul>
+    {% for v in villas %}
+    <li>
+        <a href="{% url 'villa_manage_rooms' slug=v.slug %}">{{ v.name }}</a>
+        {% if not v.is_published %}<span style="color:#888;">(draft)</span>{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<p><a href="{% url 'villa_list_staff' %}">View all</a></p>
+{% else %}
+<p>No villas yet. <a href="{% url 'villa_add' %}">Add your first villa</a> and then add rooms and 360° or regular images for each room.</p>
+{% endif %}
+{% endblock %}
+

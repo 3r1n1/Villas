@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ villa.name }} — Villa{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+{% endblock %}
+
+{% block body_class %}villa-detail-page{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_list' %}">← Villas</a></p>
+{% if villa.thumbnail %}
+<div class="villa-hero"><img src="{{ villa.thumbnail.url }}" alt="{{ villa.name }}"/></div>
+{% endif %}
+<h1>{{ villa.name }}</h1>
+{% if villa.city or villa.zone %}
+<p class="villa-location-line">{{ villa.city }}{% if villa.city and villa.zone %} · {% endif %}{{ villa.zone }}</p>
+{% endif %}
+{% if villa.address %}<p class="address">{{ villa.address }}</p>{% endif %}
+<p class="villa-specs-summary">
+    <span>{{ villa.get_property_type_display }}</span>
+    {% if villa.bedroom_count %}<span>{{ villa.bedroom_count }} bedroom{{ villa.bedroom_count|pluralize }}</span>{% endif %}
+    {% if villa.bathroom_count %}<span>{{ villa.bathroom_count }} bathroom{{ villa.bathroom_count|pluralize }} / WC</span>{% endif %}
+    {% if villa.has_garage %}<span>Garage</span>{% endif %}
+    {% if villa.price %}<span class="villa-price-tag">{{ villa.price|floatformat:2 }}</span>{% endif %}
+</p>
+{% if villa.description %}<p>{{ villa.description }}</p>{% endif %}
+
+<div class="villa-cta-row">
+    {% if has_tour %}
+    <a class="btn btn-primary" href="{% url 'villa_tour' slug=villa.slug %}">Enter virtual tour</a>
+    {% endif %}
+    <div class="booking-widget">
+        <label class="booking-widget-label" for="booking-date-range">Stay dates</label>
+        <input type="text" id="booking-date-range" class="booking-date-input" placeholder="Select check-in & check-out" readonly autocomplete="off"/>
+        <button type="button" class="btn btn-secondary" id="book-open-btn" disabled>Book now</button>
+    </div>
+</div>
+{% if not has_tour %}
+<p class="hint-muted">No tour yet. Rooms will appear here once the property has rooms with photosphere images.</p>
+{% endif %}
+
+<div id="booking-modal" class="modal" hidden>
+    <div class="modal-backdrop" data-modal-close aria-hidden="true"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+        <button type="button" class="modal-close" data-modal-close aria-label="Close">&times;</button>
+        <h2 id="booking-modal-title">Request a booking</h2>
+        <p class="booking-dates-summary" id="booking-dates-summary"></p>
+        <form id="booking-form" method="post" action="{% url 'villa_booking_create' slug=villa.slug %}">
+            {% csrf_token %}
+            {{ booking_form.start_date }}
+            {{ booking_form.end_date }}
+            <div class="form-field">
+                <label for="id_full_name">Full name</label>
+                {{ booking_form.full_name }}
+                {% if booking_form.full_name.errors %}<span class="error">{{ booking_form.full_name.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-field">
+                <label for="id_phone_number">Phone number</label>
+                {{ booking_form.phone_number }}
+                {% if booking_form.phone_number.errors %}<span class="error">{{ booking_form.phone_number.errors.0 }}</span>{% endif %}
+            </div>
+            <p class="booking-feedback" id="booking-feedback" role="status"></p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn" id="booking-submit-btn">Submit request</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+(function () {
+    var datesUrl = "{% url 'villa_booking_disabled_dates' slug=villa.slug %}";
+    var modal = document.getElementById('booking-modal');
+    var openBtn = document.getElementById('book-open-btn');
+    var form = document.getElementById('booking-form');
+    var feedback = document.getElementById('booking-feedback');
+    var summary = document.getElementById('booking-dates-summary');
+    var submitBtn = document.getElementById('booking-submit-btn');
+    var fp = null;
+
+    function pickerOnChange(selectedDates, dateStr, instance) {
+        if (selectedDates.length === 2) {
+            document.getElementById('id_start_date').value =
+                instance.formatDate(selectedDates[0], 'Y-m-d');
+            document.getElementById('id_end_date').value =
+                instance.formatDate(selectedDates[1], 'Y-m-d');
+            openBtn.disabled = false;
+        } else {
+            openBtn.disabled = true;
+        }
+    }
+
+    function openModal() {
+        modal.hidden = false;
+        document.body.classList.add('modal-open');
+        feedback.textContent = '';
+        feedback.className = 'booking-feedback';
+        var sd = document.getElementById('id_start_date').value;
+        var ed = document.getElementById('id_end_date').value;
+        if (sd && ed) {
+            summary.textContent = 'Dates: ' + sd + ' → ' + ed;
+        }
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+
+    document.querySelectorAll('[data-modal-close]').forEach(function (el) {
+        el.addEventListener('click', closeModal);
+    });
+
+    fetch(datesUrl, { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            var disabled = data.disabled || [];
+            fp = flatpickr('#booking-date-range', {
+                mode: 'range',
+                minDate: 'today',
+                disable: disabled,
+                dateFormat: 'Y-m-d',
+                onChange: pickerOnChange
+            });
+        })
+        .catch(function () {
+            fp = flatpickr('#booking-date-range', {
+                mode: 'range',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                onChange: pickerOnChange
+            });
+        });
+
+    openBtn.addEventListener('click', openModal);
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        feedback.textContent = '';
+        feedback.className = 'booking-feedback';
+        submitBtn.disabled = true;
+        var fd = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: fd,
+            credentials: 'same-origin'
+        })
+            .then(function (r) {
+                return r.json().catch(function () { return {}; }).then(function (data) {
+                    return { ok: r.ok, status: r.status, data: data };
+                });
+            })
+            .then(function (result) {
+                if (result.ok && result.data.ok) {
+                    feedback.className = 'booking-feedback';
+                    if (result.data.warning) {
+                        feedback.textContent = result.data.warning;
+                        feedback.classList.add('error');
+                    } else if (result.data.info) {
+                        feedback.textContent = result.data.info;
+                        feedback.classList.add('info');
+                    } else {
+                        feedback.textContent = 'Thank you. We received your request and will contact you shortly.';
+                        feedback.classList.add('success');
+                    }
+                    document.getElementById('id_full_name').value = '';
+                    document.getElementById('id_phone_number').value = '';
+                    if (fp) { fp.clear(); }
+                    document.getElementById('id_start_date').value = '';
+                    document.getElementById('id_end_date').value = '';
+                    openBtn.disabled = true;
+                    var closeDelay = (result.data.warning || result.data.info) ? 6500 : 2200;
+                    setTimeout(closeModal, closeDelay);
+                } else if (result.data && result.data.errors) {
+                    var err = result.data.errors;
+                    var msg = [];
+                    Object.keys(err).forEach(function (k) {
+                        if (err[k] && err[k].length) msg.push(err[k].join(' '));
+                    });
+                    feedback.textContent = msg.length ? msg.join(' ') : 'Please check the form and try again.';
+                    feedback.classList.add('error');
+                } else {
+                    feedback.textContent = 'Something went wrong. Please try again.';
+                    feedback.classList.add('error');
+                }
+            })
+            .catch(function () {
+                feedback.textContent = 'Network error. Please try again.';
+                feedback.classList.add('error');
+            })
+            .finally(function () {
+                submitBtn.disabled = false;
+            });
+    });
+})();
+</script>
+{% endblock %}

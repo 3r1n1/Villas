@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Rooms — {{ villa.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_list_staff' %}">← Manage villas</a></p>
+<h1>{{ villa.name }}</h1>
+<p>
+    <a href="{% url 'villa_edit' slug=villa.slug %}">Edit villa</a>
+    —
+    <a href="{% url 'villa_delete' slug=villa.slug %}">Delete villa</a>
+    —
+    <a href="{% url 'villa_tour' slug=villa.slug %}" target="_blank" rel="noopener">Preview tour</a>
+</p>
+
+<h2>Add room</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="btn" type="submit">Add room</button>
+</form>
+
+<h2>Rooms</h2>
+{% if rooms %}
+<ul>
+    {% for room in rooms %}
+    <li>
+        <strong>{{ room.name }}</strong>
+        — <a href="{% url 'room_edit' room_id=room.id %}">Edit</a>
+        — <a href="{% url 'room_hotspots' room_id=room.id %}">Hotspots</a>
+        — <a href="{% url 'room_image_add' room_id=room.id %}">Add flat image</a>
+        — <a href="{% url 'villa_tour_room' slug=villa.slug room_id=room.id %}" target="_blank" rel="noopener">Tour</a>
+        <form method="post" action="{% url 'room_delete' room_id=room.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-link" onclick="return confirm('Delete this room and all its images?');">Delete room</button>
+        </form>
+        <ul>
+            {% for img in room.images.all %}
+            <li>
+                {% if img.is_360 %}360° — {% endif %}{{ img.caption|default:"Image" }}
+                <form method="post" action="{% url 'room_image_delete' image_id=img.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-link" onclick="return confirm('Remove this image?');">Delete</button>
+                </form>
+            </li>
+            {% empty %}
+            <li class="muted">No flat gallery images.</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No rooms yet. Add one above.</p>
+{% endif %}
+{% endblock %}

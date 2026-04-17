@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Delete villa — {{ villa.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_list_staff' %}">← Manage villas</a></p>
+<h1>Delete villa</h1>
+<p>You are about to delete <strong>{{ villa.name }}</strong>.</p>
+<p>This will permanently remove:</p>
+<ul>
+    <li>The villa record</li>
+    <li>All rooms in this villa</li>
+    <li>All room images linked to those rooms</li>
+</ul>
+
+<form method="post">
+    {% csrf_token %}
+    <button class="btn" type="submit">Yes, delete villa</button>
+    <a class="btn btn-secondary" href="{% url 'villa_manage_rooms' slug=villa.slug %}">Cancel</a>
+</form>
+{% endblock %}

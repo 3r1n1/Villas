@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Find your next stay</h1>
+<p>
+    Browse villas with no account needed. Explore each property room by room with an interactive view.
+</p>
+<p>
+    <a class="btn" href="{% url 'villa_list' %}">Browse villas</a>
+    <a class="btn btn-secondary" href="{% url 'login' %}">Admin login</a>
+</p>
+{% endblock %}
+

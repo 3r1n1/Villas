@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Add image — {{ room.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_manage_rooms' slug=room.villa.slug %}">← {{ room.villa.name }}</a></p>
+<h1>Add image to {{ room.name }}</h1>
+<p>Upload a 360° equirectangular panorama for an interactive room view, or a regular photo.</p>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="btn" type="submit">Add image</button>
+</form>
+{% endblock %}

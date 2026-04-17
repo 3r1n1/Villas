@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Manage villas — Villa{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'dashboard' %}">← Dashboard</a></p>
+<h1>Manage villas</h1>
+<p><a class="btn" href="{% url 'villa_add' %}">Add villa</a></p>
+
+{% if villas %}
+<ul>
+    {% for v in villas %}
+    <li>
+        <a href="{% url 'villa_manage_rooms' slug=v.slug %}">{{ v.name }}</a>
+        {% if not v.is_published %}<span style="color:#888;">(draft)</span>{% endif %}
+        — <a href="{% url 'villa_edit' slug=v.slug %}">Edit</a>
+        — <a href="{% url 'villa_manage_rooms' slug=v.slug %}">Manage rooms</a>
+        — <a href="{% url 'villa_delete' slug=v.slug %}">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No villas. <a href="{% url 'villa_add' %}">Add one</a>.</p>
+{% endif %}
+{% endblock %}

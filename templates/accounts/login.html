@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Admin login</h1>
+<p>Only administrator accounts can log in here. New admins are created by a superadmin.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+                <div style="color:#b91c1c; font-size:1rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <button class="btn" type="submit">Log in</button>
+</form>
+{% endblock %}
+

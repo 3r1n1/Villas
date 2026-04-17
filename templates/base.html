@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Villa{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <header>
+        <div class="brand">Villa</div>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'villa_list' %}">Villas</a>
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'villa_list_staff' %}">Manage villas</a>
+                {% if user.is_superuser %}
+                    <a href="{% url 'add_admin' %}">Add admin</a>
+                {% endif %}
+                <a href="{% url 'logout' %}">Log out</a>
+            {% else %}
+                <a href="{% url 'login' %}">Admin login</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        <div class="card">
+            <div class="messages">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

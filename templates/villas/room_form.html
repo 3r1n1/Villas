@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Edit room — {{ room.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'villa_manage_rooms' slug=room.villa.slug %}">← {{ room.villa.name }}</a></p>
+<h1>Edit room: {{ room.name }}</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="btn" type="submit">Save</button>
+</form>
+{% endblock %}

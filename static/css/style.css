@@ -1,0 +1,682 @@
+/*
+ * Villa — Design system
+ * Typography: New Science (Regular, Semibold, Bold)
+ * Colors: Primary Green #6CDD31, Primary Blue #088DF2, Light Grey #E8E8E8
+ */
+
+/* Optional: add New Science font files to static/fonts/ and uncomment, or use Adobe Fonts embed in base.html */
+/*
+@font-face {
+  font-family: "New Science";
+  src: url("../fonts/NewScience-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "New Science";
+  src: url("../fonts/NewScience-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "New Science";
+  src: url("../fonts/NewScience-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+:root {
+  /* Design palette */
+  --color-primary-green: #6CDD31;
+  --color-primary-blue: #088DF2;
+  --color-light-grey: #E8E8E8;
+
+  /* Semantic use */
+  --color-text: #222;
+  --color-text-muted: #444;
+  --color-bg-page: var(--color-light-grey);
+  --color-bg-card: #fff;
+  --color-header-bg: var(--color-primary-blue);
+  --color-header-text: #fff;
+  --color-header-link: rgba(255, 255, 255, 0.9);
+  --color-header-link-hover: #fff;
+  --color-accent: var(--color-primary-blue);
+  --color-accent-alt: var(--color-primary-green);
+  --color-border: #d1d5db;
+  --color-success: var(--color-primary-green);
+  --color-error: #b91c1c;
+  --color-info: var(--color-primary-blue);
+
+  /* Typography */
+  --font-family: "New Science", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-weight: 400;
+  margin: 0;
+  background: var(--color-bg-page);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+header {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header a {
+  color: var(--color-header-link);
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+header a:hover {
+  color: var(--color-header-link-hover);
+}
+
+.brand {
+  font-weight: 700;
+}
+
+main {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: var(--color-bg-card);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  margin-top: 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: var(--color-accent);
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+/* Primary CTA (e.g. virtual tour) — stronger emphasis than generic .btn */
+.btn-primary {
+  background: var(--color-header-bg);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(8, 141, 242, 0.35);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-secondary {
+  background: var(--color-light-grey);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover {
+  background: #ddd;
+}
+
+.btn + .btn {
+  margin-left: 0.5rem;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  width: 100%;
+  font-family: var(--font-family);
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 2px;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--color-primary-blue);
+}
+
+.messages {
+  margin-bottom: 1rem;
+}
+
+.message {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.message.info {
+  background: rgba(8, 141, 242, 0.15);
+  color: var(--color-info);
+}
+
+.message.success {
+  background: rgba(108, 221, 49, 0.2);
+  color: #15803d;
+}
+
+.message.error {
+  background: #fee2e2;
+  color: var(--color-error);
+}
+
+a {
+  color: var(--color-primary-blue);
+}
+
+a:hover {
+  color: var(--color-primary-green);
+}
+
+.villa-grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.villa-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: var(--color-bg-page);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  height: 100%;
+}
+
+.villa-card:hover {
+  border-color: var(--color-primary-blue);
+  background: #fff;
+}
+
+.villa-card-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--color-light-grey);
+  overflow: hidden;
+}
+
+.villa-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.villa-card-placeholder {
+  background: var(--color-border);
+}
+
+.villa-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem 1rem;
+  flex: 1;
+}
+
+.villa-card-body strong {
+  font-size: 1.05rem;
+}
+
+.villa-card-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary-blue);
+}
+
+.villa-card-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.villa-card-specs span + span::before {
+  content: "·";
+  margin-right: 0.65rem;
+  color: var(--color-border);
+}
+
+.villa-card-price {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-top: 0.15rem;
+}
+
+.villa-address {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* Villa list: search + filters */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.villa-search-form {
+  margin-bottom: 1.25rem;
+}
+
+.villa-search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.villa-search-bar .villa-search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 1rem;
+}
+
+.villa-search-bar .villa-search-input:focus {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 2px;
+}
+
+.villa-search-submit {
+  flex-shrink: 0;
+}
+
+.villa-filters {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-bg-page);
+}
+
+.villa-filters-legend {
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0 0.35rem;
+}
+
+.villa-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.filter-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.filter-select,
+.filter-input {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 1px;
+}
+
+.villa-filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.villa-filter-errors {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.villa-results-meta {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+}
+
+.villa-location-line {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin: 0.25rem 0 0;
+}
+
+.villa-specs-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  font-size: 0.95rem;
+  margin: 0.75rem 0 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--color-bg-page);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.villa-specs-summary span + span::before {
+  content: "·";
+  margin-right: 0.75rem;
+  color: var(--color-border);
+}
+
+.villa-price-tag {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.villa-hero {
+  width: 100%;
+  max-height: 320px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: var(--color-light-grey);
+}
+
+.villa-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.room-list {
+  list-style: none;
+  padding: 0;
+}
+
+.room-list li {
+  margin-bottom: 0.5rem;
+}
+
+.room-list a {
+  font-weight: 600;
+}
+
+.room-desc {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.form .error, .error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+}
+
+.help {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary-blue);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: var(--color-primary-green);
+}
+
+/* Villa detail: tour + booking row */
+.villa-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.25rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.booking-widget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-page);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+.booking-widget-label {
+  display: block;
+  width: 100%;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.booking-date-input {
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.booking-date-input:focus {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 2px;
+}
+
+.hint-muted {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Flatpickr — align with site palette */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--color-primary-blue);
+  border-color: var(--color-primary-blue);
+}
+
+.flatpickr-day.inRange {
+  background: rgba(8, 141, 242, 0.15);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Booking modal */
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal[hidden] {
+  display: none !important;
+}
+
+.modal:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--color-bg-card);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal-panel h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: 0.25rem;
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+  background: var(--color-light-grey);
+}
+
+.booking-dates-summary {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+}
+
+.modal-panel .form-field {
+  margin-bottom: 0.75rem;
+}
+
+.modal-panel .form-field label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.booking-feedback {
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+.booking-feedback.success {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.booking-feedback.error {
+  color: var(--color-error);
+  font-weight: 500;
+}
+
+.booking-feedback.info {
+  color: var(--color-text);
+  font-weight: 500;
+  background: rgba(8, 141, 242, 0.12);
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+}

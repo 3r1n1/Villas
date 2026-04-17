@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}tour-page{% endblock %}
+
+{% block title %}Tour — {{ villa.name }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/pannellum/build/pannellum.css' %}"/>
+<style>
+body.tour-page main { max-width: 100%; padding: 0 0.5rem; }
+body.tour-page main .card { padding: 0.5rem 0; box-shadow: none; background: transparent; max-width: 100%; }
+.tour-shell { max-width: 100%; margin: 0; padding: 0; }
+#panorama { width: 100%; height: min(75vh, 720px); border-radius: 0.75rem; overflow: hidden; background: #111; }
+.tour-bar { padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.tour-bar h1 { margin: 0; font-size: 1.1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tour-shell">
+    <div class="tour-bar">
+        <p style="margin:0;"><a href="{% url 'villa_detail' slug=villa.slug %}">← {{ villa.name }}</a></p>
+        <h1 id="tour-room-title">{{ villa.name }}</h1>
+    </div>
+    <div id="panorama" role="application" aria-label="360 virtual tour"></div>
+    <p class="hint" style="padding:0 1rem 1rem; margin:0;">Drag to look around. Click hotspots to move between rooms.</p>
+</div>
+
+{% if room.photosphere %}
+{{ tour_config|json_script:"tour-data" }}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/pannellum/build/pannellum.js' %}"></script>
+{% if room.photosphere %}
+<script>
+(function() {
+    var el = document.getElementById('tour-data');
+    if (!el || !el.textContent) return;
+    var raw = JSON.parse(el.textContent);
+    var meta = raw.meta || {};
+    var origin = "{{ request.scheme }}://{{ request.get_host }}";
+
+    /** Absolute URL for the entry scene (Room.photosphere — same as request.build_absolute_uri in the view). */
+    var primaryPanoramaUrl = "{{ room_panorama_absolute|escapejs }}";
+
+    if (!raw.default || !raw.scenes) {
+        document.getElementById('panorama').innerHTML = '<p style="color:#fff;padding:2rem;">Tour configuration is invalid.</p>';
+        return;
+    }
+
+    raw.default = Object.assign({}, raw.default, { autoLoad: true });
+
+    var scenes = raw.scenes;
+    var firstId = raw.default.firstScene;
+    if (firstId && scenes[firstId]) {
+        scenes[firstId].panorama = primaryPanoramaUrl;
+    }
+
+    for (var k in scenes) {
+        var p = scenes[k].panorama;
+        if (p && p.indexOf('http') !== 0) {
+            scenes[k].panorama = origin + (p.indexOf('/') === 0 ? p : '/' + p);
+        }
+    }
+
+    var hasPano = false;
+    for (var sk in scenes) {
+        if (scenes[sk].panorama) { hasPano = true; break; }
+    }
+    if (!hasPano) {
+        document.getElementById('panorama').innerHTML = '<p style="color:#fff;padding:2rem;">Upload equirectangular photosphere images for each room to start the tour.</p>';
+        return;
+    }
+
+    var viewer = pannellum.viewer('panorama', {
+        default: raw.default,
+        scenes: scenes
+    });
+
+    document.getElementById('panorama').addEventListener('click', function () {
+        try {
+            console.log('Pitch:', viewer.getPitch(), 'Yaw:', viewer.getYaw());
+        } catch (e) {
+            console.warn('Pitch/Yaw unavailable:', e);
+        }
+    });
+
+    function parseRoomFromPath() {
+        var m = /\/tour\/(\d+)\/?$/.exec(window.location.pathname);
+        return m ? m[1] : null;
+    }
+
+    function setTitleForScene(sceneId) {
+        var m = /^room_(\d+)$/.exec(sceneId);
+        if (!m) return;
+        var id = m[1];
+        var scene = scenes['room_' + id];
+        if (scene && scene.title) {
+            var h = document.getElementById('tour-room-title');
+            if (h) h.textContent = scene.title;
+        }
+    }
+
+    if (!parseRoomFromPath() && meta.entryRoomId) {
+        var base = meta.tourPathPrefix || '';
+        if (base && base.slice(-1) !== '/') base += '/';
+        history.replaceState(
+            { roomId: String(meta.entryRoomId) },
+            '',
+            base + meta.entryRoomId + '/'
+        );
+    }
+
+    viewer.on('scenechange', function(sceneId) {
+        setTitleForScene(sceneId);
+        var m = /^room_(\d+)$/.exec(sceneId);
+        if (!m) return;
+        var roomId = m[1];
+        if (parseRoomFromPath() === roomId) return;
+        var prefix = meta.tourPathPrefix || '';
+        if (prefix && prefix.slice(-1) !== '/') prefix += '/';
+        history.pushState({ roomId: roomId }, '', prefix + roomId + '/');
+    });
+
+    window.addEventListener('popstate', function() {
+        var id = parseRoomFromPath();
+        if (id) {
+            try {
+                viewer.loadScene('room_' + id);
+            } catch (e) {}
+        }
+    });
+
+    var initial = parseRoomFromPath();
+    if (initial) {
+        setTitleForScene('room_' + initial);
+    } else if (raw.default && raw.default.firstScene) {
+        setTitleForScene(raw.default.firstScene);
+    }
+})();
+</script>
+{% else %}
+<script>
+(function() {
+    var pan = document.getElementById('panorama');
+    if (pan) {
+        pan.innerHTML = '<p style="color:#fff;padding:2rem;">No photosphere image on this villa’s entry room. Upload a 360° equirectangular image on the room (Photosphere field) in Manage villas.</p>';
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}
